@@ -11,6 +11,8 @@ description: Use only when a runtime or verifier subagent receives an existing G
 
 Use it when a runtime wants an isolated check of current state against a previously authored Goal Contract. This skill does not rewrite the contract, does not continue into planning or execution, and does not return free-form review prose. It returns only a structured `Verifier Verdict`.
 
+The `Verifier Verdict` is binding runtime feedback, not advice. Once a runtime invokes or consumes this verifier, it must respect the verdict and status when interpreting whether current work still aligns with the Goal Contract.
+
 ## When To Use
 
 Use this skill only when all of these are true:
@@ -56,6 +58,15 @@ Verification Package:
 If any of these inputs are missing, contradictory, or too weak to support a runtime judgment, return `escalate`.
 
 Use `references/contract-validation.md` for the full runtime validation protocol.
+
+## Runtime Constraint
+
+This verifier does not decide invocation timing, and it does not take over planning, execution, recovery, or completion. It does constrain any runtime that chooses to use it.
+
+- `pass` means the Goal Contract still frames the current state; it does not mean the goal is complete unless `status` is also `complete`.
+- `revise contract` means the current Goal Contract is not reliable enough to constrain the goal; the runtime must return to the authoring layer before treating the current state as aligned.
+- `escalate` means the runtime lacks enough trustworthy input, evidence, approval, or consistency to judge alignment; the runtime must stop optimistic interpretation and escalate outside the verifier.
+- `blocked` means execution is blocked; the runtime must not summarize the goal as complete.
 
 ## Validation Standard
 

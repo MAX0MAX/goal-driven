@@ -2,7 +2,7 @@
 
 Runtime verification checks whether current progress, evidence, and blockers still justify a Goal Contract as written.
 
-This is a paired runtime protocol for `goal-contract-verifier`, not part of canonical Goal Contract generation. `goal-driven` authors the contract. Runtimes may later call `goal-contract-verifier` when they want an isolated verification pass.
+This is a paired runtime protocol for `goal-contract-verifier`, not part of canonical Goal Contract generation. `goal-driven` authors the contract. Runtimes may later call `goal-contract-verifier` when they want an isolated verification pass, and any consumed `Verifier Verdict` is binding runtime feedback.
 
 ## Verification Inputs
 
@@ -32,17 +32,18 @@ Then read the contract fields in full:
 7. Check whether new runtime information exposes missing, overlapping, subjective, or non-binary contract criteria.
 8. Check that any adapter metadata, if present, stays outside the canonical contract.
 
-## Recommended Runtime Flow
+## Runtime Constraint
 
-1. Author the Goal Contract with `goal-driven`.
-2. Let the runtime gather current progress, current evidence, and current blockers.
-3. Invoke `goal-contract-verifier` when the runtime needs an independent check.
-4. Consume exactly one `verdict` and one `status`.
-5. If `verdict` is `revise contract`, update the Goal Contract in the authoring layer before treating the runtime state as validated.
-6. If `verdict` is `escalate`, stop optimistic interpretation and resolve the blocker or contradiction before continuing.
-7. Use `status` to distinguish `on_track`, `complete`, and `blocked` runtime states.
+The verifier does not prescribe invocation timing. Fresh-subagent isolation, fail-closed behavior, and recovery mechanics are host or adapter choices, not Goal Contract schema rules.
 
-Fresh-subagent isolation and fail-closed behavior are runtime choices. Use them when the host needs stronger independence or conservative failure handling, but do not treat them as Goal Contract schema rules.
+Once a runtime invokes or consumes `goal-contract-verifier`, the resulting `Verifier Verdict` constrains runtime interpretation:
+
+- Consume exactly one `verdict` and one `status`.
+- If `verdict` is `pass`, the Goal Contract still frames the current runtime state, but completion still depends on `status`.
+- If `verdict` is `revise contract`, update the Goal Contract in the authoring layer before treating the runtime state as aligned.
+- If `verdict` is `escalate`, stop optimistic interpretation and resolve the missing input, blocker, contradiction, or approval boundary outside the verifier.
+- If `status` is `blocked`, do not summarize the goal as complete.
+- Use `status` to distinguish `on_track`, `complete`, and `blocked` runtime states.
 
 ## Runtime Status
 
@@ -57,15 +58,15 @@ Fresh-subagent isolation and fail-closed behavior are runtime choices. Use them 
 `verdict` describes contract validity:
 
 - `pass`: the Goal Contract still frames the runtime state correctly. `pass` does not mean the goal is already complete.
-- `revise contract`: the runtime package shows that the Goal Contract needs to change.
-- `escalate`: the runtime package requires escalation outside verifier authority.
+- `revise contract`: the runtime package shows that the Goal Contract needs to change before the runtime state can be treated as aligned.
+- `escalate`: the runtime package requires escalation outside verifier authority before optimistic interpretation can continue.
 
 ## Failure Outcomes
 
 If verification fails, use one of these outcomes:
 
-- `revise contract`: the contract no longer frames the runtime state precisely enough
-- `escalate`: the runtime state depends on missing decisions, missing evidence, unresolved blockers, or contradictions
+- `revise contract`: the contract no longer frames the runtime state precisely enough, so the runtime must return to the authoring layer
+- `escalate`: the runtime state depends on missing decisions, missing evidence, unresolved blockers, or contradictions, so the runtime must escalate outside the verifier
 
 Advice text, workflow prose, or any non-standard verifier response should be treated as an escalation in runtimes that require strict structured outputs.
 

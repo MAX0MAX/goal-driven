@@ -12,7 +12,7 @@ This repository is the single source of truth for the package. `skills/goal-driv
 
 Its value is not asking more questions. Its value is producing a stable contract that downstream systems and humans can understand, verify, execute, or turn into more detailed work without rediscovering the original intent.
 
-The verifier layer is intentionally separate from the canonical contract. Runtime artifacts such as `Verifier Verdict`, subagent isolation, and fail-closed behavior belong to adapters and host workflows, not to the Goal Contract schema itself.
+The verifier layer is intentionally separate from the canonical contract. Runtime artifacts such as `Verifier Verdict`, subagent isolation, and fail-closed behavior belong to adapters and host workflows, not to the Goal Contract schema itself. In runtime use, `goal-driven` defines the objective and `goal-contract-verifier` enforces alignment against that objective.
 
 The project follows four principles:
 
@@ -35,7 +35,7 @@ Every successful `goal-driven` run produces a Goal Contract with these fields:
 
 `success_criteria` are the only canonical basis for deciding whether the `goal` is complete. `evidence` proves those criteria; it does not add extra acceptance rules.
 
-Runtimes may later pair the Goal Contract with a companion `Verifier Verdict` artifact, but that runtime artifact stays outside the canonical contract. Keep the behavior details in [skills/goal-driven/SKILL.md](skills/goal-driven/SKILL.md), verifier behavior in [skills/goal-contract-verifier/SKILL.md](skills/goal-contract-verifier/SKILL.md), and host-facing runtime rules in [skills/goal-driven/INSTALL.md](skills/goal-driven/INSTALL.md).
+Runtimes may later pair the Goal Contract with a companion `Verifier Verdict` artifact, but that runtime artifact stays outside the canonical contract. If a runtime consumes a `Verifier Verdict`, it must preserve the verdict as binding runtime feedback rather than downgrade it to advice. Keep the behavior details in [skills/goal-driven/SKILL.md](skills/goal-driven/SKILL.md), verifier behavior in [skills/goal-contract-verifier/SKILL.md](skills/goal-contract-verifier/SKILL.md), and host-facing runtime rules in [skills/goal-driven/INSTALL.md](skills/goal-driven/INSTALL.md).
 
 ## Example
 
