@@ -88,11 +88,41 @@ Do not use it as a replacement for planning, execution, testing, or review.
 
 ## Quick Start
 
-To understand the agent-facing behavior, follow [skills/goal-driven/SKILL.md](skills/goal-driven/SKILL.md).
+Default Codex install:
 
-To install or invoke the public `goal-driven` entrypoint in Claude Code or Codex, follow [skills/goal-driven/INSTALL.md](skills/goal-driven/INSTALL.md).
+```bash
+npx skills add MAX0MAX/goal-driven --skill goal-driven --skill goal-contract-verifier -a codex
+```
+
+Default Claude Code install:
+
+```bash
+npx skills add MAX0MAX/goal-driven --skill goal-driven --skill goal-contract-verifier --agent claude-code
+```
+
+Use `-g` for a user-wide install.
+
+After installation, ask the agent in plain language:
+
+```text
+Use goal-driven to turn this request into a Goal Contract: <your request>
+```
+
+In Codex, explicit invocation also works:
+
+```text
+$goal-driven Turn this request into a Goal Contract: <your request>
+```
+
+In Claude Code, explicit invocation also works:
+
+```text
+/goal-driven:goal-driven Turn this request into a Goal Contract: <your request>
+```
 
 The installed package also includes `skills/goal-contract-verifier/` as the paired verifier skill for subagent use. It may still appear in the installed skills tree. Normal users should invoke only `goal-driven` unless their runtime explicitly asks for verifier input.
+
+For complete install, prompt, and internal marketplace options, follow [skills/goal-driven/INSTALL.md](skills/goal-driven/INSTALL.md). To understand the agent-facing behavior, follow [skills/goal-driven/SKILL.md](skills/goal-driven/SKILL.md).
 
 For complete before-and-after examples, see [skills/goal-driven/examples/](skills/goal-driven/examples/).
 
@@ -106,6 +136,8 @@ For complete before-and-after examples, see [skills/goal-driven/examples/](skill
   Claude Code wrapper.
 - `.codex-plugin/`
   Codex wrapper.
+- `.agents/plugins/marketplace.json`
+  Repo-local Codex marketplace entry for company-internal plugin catalogs and local install testing.
 
 ## Adapter Use
 
@@ -128,3 +160,4 @@ Adapters must not add, replace, or override canonical `success_criteria`. Any ho
 - Install guide: `skills/goal-driven/INSTALL.md`
 - Claude Code wrapper: `.claude-plugin/`
 - Codex wrapper: `.codex-plugin/`
+- Codex marketplace entry: `.agents/plugins/marketplace.json`

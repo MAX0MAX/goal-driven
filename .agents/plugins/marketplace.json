@@ -1,0 +1,20 @@
+{
+  "name": "goal-driven-company",
+  "interface": {
+    "displayName": "Goal-Driven Company Marketplace"
+  },
+  "plugins": [
+    {
+      "name": "goal-driven",
+      "source": {
+        "source": "local",
+        "path": "./"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    }
+  ]
+}

@@ -1,6 +1,6 @@
 ---
 name: goal-driven
-description: Use when a task has a concrete outcome but unclear goal, scope, success criteria, evidence, or guardrails.
+description: Use when the user asks to define a goal, create a Goal Contract, or clarify a concrete task's goal, scope, success criteria, evidence, or guardrails before planning or execution.
 ---
 
 # Goal-Driven

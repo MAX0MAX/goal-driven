@@ -4,9 +4,110 @@ Install `goal-driven` for the current harness, then use it to produce a canonica
 
 `goal-driven` is the only normal user-facing entrypoint. The installed package also includes the paired `goal-contract-verifier` skill for runtimes that want isolated verification later. That verifier skill may still appear in the installed skills tree even though normal invocation starts with `goal-driven`.
 
+## Recommended: npx Skills
+
+Use the open Agent Skills installer as the default path.
+
+Codex project install:
+
+```bash
+npx skills add MAX0MAX/goal-driven --skill goal-driven --skill goal-contract-verifier -a codex
+```
+
+User-wide Codex install:
+
+```bash
+npx skills add MAX0MAX/goal-driven --skill goal-driven --skill goal-contract-verifier -g -a codex
+```
+
+Claude Code project install:
+
+```bash
+npx skills add MAX0MAX/goal-driven --skill goal-driven --skill goal-contract-verifier --agent claude-code
+```
+
+User-wide Claude Code install:
+
+```bash
+npx skills add MAX0MAX/goal-driven --skill goal-driven --skill goal-contract-verifier --agent claude-code -g
+```
+
+Codex and Claude Code together:
+
+```bash
+npx skills add MAX0MAX/goal-driven --skill goal-driven --skill goal-contract-verifier --agent codex --agent claude-code
+```
+
+Company-internal Git repo install:
+
+```bash
+npx skills add https://github.com/<company>/goal-driven --skill goal-driven --skill goal-contract-verifier --agent codex --agent claude-code
+```
+
+Keep both `goal-driven` and `goal-contract-verifier` in the install command so runtimes that use isolated verification can find the paired verifier from the same source tree. Normal users should still invoke only `goal-driven`.
+
+## Simple Prompt Use
+
+Users do not need to know the schema first. They can ask in plain language:
+
+```text
+Use goal-driven to turn this request into a Goal Contract: <your request>
+```
+
+Explicit Codex invocation:
+
+```text
+$goal-driven Turn this request into a Goal Contract: <your request>
+```
+
+Explicit Claude Code invocation:
+
+```text
+/goal-driven:goal-driven Turn this request into a Goal Contract: <your request>
+```
+
+## Company Codex Marketplace
+
+For company distribution through the Codex plugin directory, publish a marketplace catalog that points at this plugin package. This repo includes a local marketplace entry at `.agents/plugins/marketplace.json` for local testing or as a starting point for an internal catalog.
+
+Local marketplace install while developing this repo:
+
+```bash
+codex plugin marketplace add ./
+```
+
+Company marketplace repo install:
+
+```bash
+codex plugin marketplace add <company>/<marketplace-repo> --ref main
+```
+
+Recommended company marketplace entry:
+
+```json
+{
+  "name": "goal-driven",
+  "source": {
+    "source": "git-subdir",
+    "url": "https://github.com/<company>/goal-driven.git",
+    "path": "./",
+    "ref": "main"
+  },
+  "policy": {
+    "installation": "AVAILABLE",
+    "authentication": "ON_INSTALL"
+  },
+  "category": "Productivity"
+}
+```
+
+The marketplace path should point at the plugin root containing `.codex-plugin/plugin.json` and the full `skills/` tree.
+
 ## Claude Code
 
 Use the local plugin wrapper in `.claude-plugin/`.
+
+This is the Claude Code plugin path. For the default npx install path, use the Claude Code commands in [Recommended: npx Skills](#recommended-npx-skills).
 
 Marketplace install:
 
@@ -24,19 +125,7 @@ claude --plugin-dir /Users/you/path/to/goal-driven
 Invoke:
 
 ```text
-/goal-driven:goal-driven Turn this task into a Goal Contract with explicit scope, success_criteria, evidence, and guardrails.
-```
-
-## Codex
-
-Use the repository root so Codex can read `.codex-plugin/plugin.json` and the full `skills/` tree from the same source tree.
-
-If you manage skills directly, install the full `skills/` tree so both `goal-driven` and `goal-contract-verifier` are available from the same source tree.
-
-Invoke:
-
-```text
-$goal-driven Turn this task into a Goal Contract with explicit scope, success_criteria, evidence, and guardrails.
+/goal-driven:goal-driven Turn this request into a Goal Contract: <your request>
 ```
 
 ## Output Standard
