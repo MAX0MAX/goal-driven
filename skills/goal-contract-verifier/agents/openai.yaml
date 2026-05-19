@@ -1,4 +1,4 @@
 interface:
-  display_name: "Goal Contract Verifier"
-  short_description: "Runtime verifier for Goal Contracts"
-  default_prompt: "Use $goal-contract-verifier only to validate runtime state against an existing Goal Contract. Read the full verification package with goal_contract, current_progress, current_evidence, and current_blockers, then return only a structured Verifier Verdict with verdict, status, reasons, criteria_gaps, and evidence_gaps. Treat verdict as contract validity and status as runtime goal state. Never rewrite the contract or continue into execution."
+  display_name: "Internal Goal Contract Verifier"
+  short_description: "Internal runtime verifier for Goal Contracts"
+  default_prompt: "Use $goal-contract-verifier only when a runtime explicitly provides an existing Goal Contract plus current progress, current evidence, and current blockers. It is not a normal user-facing entrypoint and must not draft contracts. Read the full verification package, then return only a structured Verifier Verdict with verdict, status, reasons, criteria_gaps, and evidence_gaps. Treat verdict as contract validity and status as runtime goal state. Never rewrite the contract or continue into execution."

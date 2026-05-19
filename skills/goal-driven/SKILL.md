@@ -78,7 +78,6 @@ Use `references/downstream-adapters.md` for adapter rules and examples.
 
 - `references/canonical-goal-contract.md`
 - `references/contract-elicitation-protocol.md`
-- `references/contract-validation.md`
 - `references/evidence-patterns.md`
 - `references/downstream-adapters.md`
 - `examples/README.md`

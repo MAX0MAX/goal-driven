@@ -93,6 +93,19 @@ Verifier Verdict:
   evidence_gaps: []
 ```
 
+When gaps are present, runtimes should preserve structured items outside the Goal Contract body:
+
+```yaml
+criteria_gaps:
+  - criterion: "<affected or missing criterion>"
+    gap: "<missing, overlapping, subjective, non-binary, or incomplete coverage>"
+    reason: "<why this prevents reliable runtime judgment>"
+evidence_gaps:
+  - criterion: "<affected criterion>"
+    gap: "<missing, weak, contradictory, or hidden-rule evidence>"
+    reason: "<why current evidence cannot prove or disprove the criterion>"
+```
+
 That runtime artifact is optional from the contract's perspective. It is not a Goal Contract field, and it must not become a required part of the canonical schema.
 
 ## Adapter Metadata

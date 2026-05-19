@@ -29,7 +29,7 @@ Invoke:
 
 ## Codex
 
-Use the repository root so Codex can read `.codex-plugin/plugin.json` and `skills/goal-driven/` from the same source tree.
+Use the repository root so Codex can read `.codex-plugin/plugin.json` and the full `skills/` tree from the same source tree.
 
 If you manage skills directly, install the full `skills/` tree so both `goal-driven` and `goal-contract-verifier` are available from the same source tree.
 
@@ -82,10 +82,19 @@ Verification Package:
   goal_contract:
     Goal Contract:
       goal: "<one-sentence end state>"
-      scope: {}
-      success_criteria: []
-      evidence: []
-      guardrails: []
+      scope:
+        in_scope:
+          - "<required work>"
+        out_of_scope:
+          - "<excluded work>"
+      success_criteria:
+        - "<observable completion condition>"
+      evidence:
+        - criterion: "<criterion or group>"
+          proof:
+            - "<planned command, artifact, diff, or review gate>"
+      guardrails:
+        - "<constraint, escalation rule, or approval boundary>"
   current_progress:
     - "<what has been done or observed so far>"
   current_evidence:
@@ -118,6 +127,19 @@ Verifier Verdict:
     - "<short runtime validation rationale>"
   criteria_gaps: []
   evidence_gaps: []
+```
+
+When gaps are present, use this item shape:
+
+```yaml
+criteria_gaps:
+  - criterion: "<affected or missing criterion>"
+    gap: "<missing, overlapping, subjective, non-binary, or incomplete coverage>"
+    reason: "<why this prevents reliable runtime judgment>"
+evidence_gaps:
+  - criterion: "<affected criterion>"
+    gap: "<missing, weak, contradictory, or hidden-rule evidence>"
+    reason: "<why current evidence cannot prove or disprove the criterion>"
 ```
 
 Interpret that artifact with two separate dimensions:

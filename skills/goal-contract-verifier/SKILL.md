@@ -1,6 +1,6 @@
 ---
 name: goal-contract-verifier
-description: Use when a runtime or verifier subagent receives a Goal Contract plus current progress, evidence, and blockers and must independently judge the runtime state.
+description: Use only when a runtime or verifier subagent receives an existing Goal Contract plus current progress, evidence, and blockers and must independently judge runtime state; not for normal user-facing contract drafting.
 ---
 
 # Goal Contract Verifier
@@ -55,6 +55,8 @@ Verification Package:
 
 If any of these inputs are missing, contradictory, or too weak to support a runtime judgment, return `escalate`.
 
+Use `references/contract-validation.md` for the full runtime validation protocol.
+
 ## Validation Standard
 
 Check the runtime package against these rules:
@@ -89,6 +91,19 @@ Verifier Verdict:
     - "<concrete runtime validation finding>"
   criteria_gaps: []
   evidence_gaps: []
+```
+
+When gaps are present, each item must use this shape:
+
+```yaml
+criteria_gaps:
+  - criterion: "<affected or missing criterion>"
+    gap: "<missing, overlapping, subjective, non-binary, or incomplete coverage>"
+    reason: "<why this prevents reliable runtime judgment>"
+evidence_gaps:
+  - criterion: "<affected criterion>"
+    gap: "<missing, weak, contradictory, or hidden-rule evidence>"
+    reason: "<why current evidence cannot prove or disprove the criterion>"
 ```
 
 ## Status Semantics

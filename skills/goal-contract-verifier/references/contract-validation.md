@@ -2,7 +2,7 @@
 
 Runtime verification checks whether current progress, evidence, and blockers still justify a Goal Contract as written.
 
-This is a paired runtime protocol, not part of canonical Goal Contract generation. `goal-driven` authors the contract. Runtimes may later call `goal-contract-verifier` when they want an isolated verification pass.
+This is a paired runtime protocol for `goal-contract-verifier`, not part of canonical Goal Contract generation. `goal-driven` authors the contract. Runtimes may later call `goal-contract-verifier` when they want an isolated verification pass.
 
 ## Verification Inputs
 
@@ -85,13 +85,26 @@ Verifier Verdict:
   evidence_gaps: []
 ```
 
+When gaps are present, each item must use this shape:
+
+```yaml
+criteria_gaps:
+  - criterion: "<affected or missing criterion>"
+    gap: "<missing, overlapping, subjective, non-binary, or incomplete coverage>"
+    reason: "<why this prevents reliable runtime judgment>"
+evidence_gaps:
+  - criterion: "<affected criterion>"
+    gap: "<missing, weak, contradictory, or hidden-rule evidence>"
+    reason: "<why current evidence cannot prove or disprove the criterion>"
+```
+
 With these rules:
 
 - `verdict`: `pass`, `revise contract`, or `escalate`
 - `status`: `on_track`, `complete`, or `blocked`
 - `reasons`: concrete findings tied to the contract or runtime package
-- `criteria_gaps`: any missing, overlapping, subjective, or non-binary criteria exposed by runtime verification
-- `evidence_gaps`: any criterion that current runtime evidence cannot prove or disprove
+- `criteria_gaps`: structured gap items for any missing, overlapping, subjective, non-binary, or incomplete criteria exposed by runtime verification
+- `evidence_gaps`: structured gap items for any criterion that current runtime evidence cannot prove or disprove
 - the verifier must not return a rewritten contract
 
 ## Pass Standard
