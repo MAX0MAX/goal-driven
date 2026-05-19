@@ -88,7 +88,13 @@ Do not use it as a replacement for planning, execution, testing, or review.
 
 ## Quick Start
 
-Default Codex install:
+Codex Marketplace plugin install:
+
+```bash
+npx codex-marketplace add MAX0MAX/goal-driven --plugin --project -y
+```
+
+Default Codex skill install:
 
 ```bash
 npx skills add MAX0MAX/goal-driven --skill goal-driven --skill goal-contract-verifier -a codex
@@ -122,9 +128,15 @@ In Claude Code, explicit invocation also works:
 
 The installed package also includes `skills/goal-contract-verifier/` as the paired verifier skill for subagent use. It may still appear in the installed skills tree. Normal users should invoke only `goal-driven` unless their runtime explicitly asks for verifier input.
 
-For complete install, prompt, and internal marketplace options, follow [skills/goal-driven/INSTALL.md](skills/goal-driven/INSTALL.md). To understand the agent-facing behavior, follow [skills/goal-driven/SKILL.md](skills/goal-driven/SKILL.md).
+For complete install, prompt, and marketplace options, follow [skills/goal-driven/INSTALL.md](skills/goal-driven/INSTALL.md). To understand the agent-facing behavior, follow [skills/goal-driven/SKILL.md](skills/goal-driven/SKILL.md).
 
 For complete before-and-after examples, see [skills/goal-driven/examples/](skills/goal-driven/examples/).
+
+## Marketplace Readiness
+
+- Codex Marketplace reads `.codex-plugin/plugin.json` at the repository root and installs this package as a plugin.
+- Open Agent Skill can read `skill.json` for discovery metadata once the repository meets its submission requirements.
+- The Open Agent Skill category is `Developer Tools`; recommended tags are `goal-contract`, `agent-skills`, `codex`, `claude-code`, `verification`, and `workflow`.
 
 ## Repository Layout
 
@@ -138,6 +150,8 @@ For complete before-and-after examples, see [skills/goal-driven/examples/](skill
   Codex wrapper.
 - `.agents/plugins/marketplace.json`
   Repo-local Codex marketplace entry for company-internal plugin catalogs and local install testing.
+- `skill.json`
+  Open Agent Skill manifest for public discovery metadata.
 
 ## Adapter Use
 

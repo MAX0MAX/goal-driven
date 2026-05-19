@@ -1,6 +1,6 @@
 {
   "name": "goal-driven",
-  "version": "1.3.1",
+  "version": "1.3.2",
   "description": "Contract-first dual-skill package that turns ambiguous requests into canonical Goal Contracts.",
   "author": {
     "name": "Yifei Huang",
@@ -19,9 +19,9 @@
   "interface": {
     "displayName": "Goal-Driven",
     "shortDescription": "Turn requests into Goal Contracts",
-    "longDescription": "Goal-Driven is the normal user-facing entrypoint for turning ambiguous work into a canonical Goal Contract with goal, scope, success_criteria, evidence, and guardrails. Install it with npx for lightweight skill distribution or through a company Codex marketplace as a plugin. The package also includes the paired goal-contract-verifier skill for runtimes that want isolated verification against current progress, evidence, and blockers.",
+    "longDescription": "Goal-Driven is the normal user-facing entrypoint for turning ambiguous work into a canonical Goal Contract with goal, scope, success_criteria, evidence, and guardrails. Install it through Codex Marketplace as a plugin, or with npx skills for lightweight skill distribution. The package also includes the paired goal-contract-verifier skill for runtimes that want isolated verification against current progress, evidence, and blockers.",
     "developerName": "Yifei Huang",
-    "category": "Coding",
+    "category": "Developer Tools",
     "capabilities": [
       "Interactive",
       "Read",

@@ -4,9 +4,27 @@ Install `goal-driven` for the current harness, then use it to produce a canonica
 
 `goal-driven` is the only normal user-facing entrypoint. The installed package also includes the paired `goal-contract-verifier` skill for runtimes that want isolated verification later. That verifier skill may still appear in the installed skills tree even though normal invocation starts with `goal-driven`.
 
-## Recommended: npx Skills
+## Recommended: Codex Marketplace
 
-Use the open Agent Skills installer as the default path.
+Use the Codex Marketplace plugin install when you want the full package through Codex's plugin path.
+
+Codex project install:
+
+```bash
+npx codex-marketplace add MAX0MAX/goal-driven --plugin --project -y
+```
+
+User-wide Codex install:
+
+```bash
+npx codex-marketplace add MAX0MAX/goal-driven --plugin --global -y
+```
+
+The plugin root is this repository root. It contains `.codex-plugin/plugin.json` and the full `skills/` tree.
+
+## Alternative: npx Skills
+
+Use the open Agent Skills installer when you want a direct skill install instead of the Codex plugin wrapper.
 
 Codex project install:
 
@@ -66,21 +84,29 @@ Explicit Claude Code invocation:
 /goal-driven:goal-driven Turn this request into a Goal Contract: <your request>
 ```
 
+## Publish To Codex Marketplace
+
+This repository is packaged as a root Codex plugin. Public Codex Marketplace submission uses the repository URL:
+
+```text
+https://github.com/MAX0MAX/goal-driven
+```
+
+Submit it through the signed-in Codex Marketplace submit page:
+
+```text
+https://www.codex-marketplace.com/submit
+```
+
+Codex Marketplace validates `.codex-plugin/plugin.json`, then adds the repository to the review queue. After approval, users can install it with:
+
+```bash
+npx codex-marketplace add MAX0MAX/goal-driven --plugin --project -y
+```
+
 ## Company Codex Marketplace
 
 For company distribution through the Codex plugin directory, publish a marketplace catalog that points at this plugin package. This repo includes a local marketplace entry at `.agents/plugins/marketplace.json` for local testing or as a starting point for an internal catalog.
-
-Local marketplace install while developing this repo:
-
-```bash
-codex plugin marketplace add ./
-```
-
-Company marketplace repo install:
-
-```bash
-codex plugin marketplace add <company>/<marketplace-repo> --ref main
-```
 
 Recommended company marketplace entry:
 
@@ -103,11 +129,19 @@ Recommended company marketplace entry:
 
 The marketplace path should point at the plugin root containing `.codex-plugin/plugin.json` and the full `skills/` tree.
 
+## Open Agent Skill Readiness
+
+This repository includes a root `skill.json` manifest for Open Agent Skill discovery. Use these submission values when the repository meets the marketplace star requirement:
+
+- Repository: `https://github.com/MAX0MAX/goal-driven`
+- Category: `Developer Tools`
+- Tags: `goal-contract`, `agent-skills`, `codex`, `claude-code`, `verification`, `workflow`
+
 ## Claude Code
 
 Use the local plugin wrapper in `.claude-plugin/`.
 
-This is the Claude Code plugin path. For the default npx install path, use the Claude Code commands in [Recommended: npx Skills](#recommended-npx-skills).
+This is the Claude Code plugin path. For the default npx install path, use the Claude Code commands in [Alternative: npx Skills](#alternative-npx-skills).
 
 Marketplace install:
 

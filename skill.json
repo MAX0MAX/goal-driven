@@ -1,0 +1,40 @@
+{
+  "name": "goal-driven",
+  "version": "1.3.2",
+  "description": "Contract-first skill package that turns ambiguous requests into canonical Goal Contracts with goal, scope, success_criteria, evidence, and guardrails.",
+  "category": "Developer Tools",
+  "platforms": [
+    "codex",
+    "claude-code",
+    "open-agent-skills"
+  ],
+  "author": {
+    "name": "Yifei Huang",
+    "github": "MAX0MAX",
+    "url": "https://github.com/MAX0MAX"
+  },
+  "repository": "https://github.com/MAX0MAX/goal-driven",
+  "license": "MIT",
+  "tags": [
+    "goal-contract",
+    "agent-skills",
+    "codex",
+    "claude-code",
+    "verification",
+    "workflow"
+  ],
+  "skills": [
+    {
+      "name": "goal-driven",
+      "path": "skills/goal-driven",
+      "entrypoint": "skills/goal-driven/SKILL.md",
+      "primary": true
+    },
+    {
+      "name": "goal-contract-verifier",
+      "path": "skills/goal-contract-verifier",
+      "entrypoint": "skills/goal-contract-verifier/SKILL.md",
+      "primary": false
+    }
+  ]
+}
