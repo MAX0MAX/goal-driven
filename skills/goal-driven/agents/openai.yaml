@@ -1,0 +1,4 @@
+interface:
+  display_name: "Goal-Driven"
+  short_description: "Produce a canonical Goal Contract"
+  default_prompt: "Use $goal-driven as the normal user-facing entrypoint. Clarify only what is required, then return a Goal Contract with goal, scope, success_criteria, evidence, and guardrails. Keep the contract canonical and execution-neutral. Do not add runtime verifier workflow, host routing, or downstream planning metadata to the contract body."

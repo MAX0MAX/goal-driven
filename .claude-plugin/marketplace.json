@@ -1,0 +1,18 @@
+{
+  "name": "goal-driven-dev",
+  "description": "Development marketplace for the Goal-Driven contract-first dual-skill package",
+  "owner": {
+    "name": "Yifei Huang"
+  },
+  "plugins": [
+    {
+      "name": "goal-driven",
+      "description": "Public goal-driven entrypoint for canonical Goal Contracts.",
+      "version": "1.3.0",
+      "source": "./",
+      "author": {
+        "name": "Yifei Huang"
+      }
+    }
+  ]
+}
