@@ -2,7 +2,7 @@
 
 Runtime verification checks whether current progress, evidence, and blockers still justify a Goal Contract as written.
 
-This is a paired runtime protocol for `goal-contract-verifier`, not part of canonical Goal Contract generation. `goal-driven` authors the contract. Runtimes may later call `goal-contract-verifier` when they want an isolated verification pass, and any consumed `Verifier Verdict` is binding runtime feedback.
+This is a paired runtime protocol for `goal-contract-verifier`, not part of canonical Goal Contract generation. `goal-contract-writer` authors the contract. Runtimes may later call `goal-contract-verifier` when they want an isolated verification pass, and any consumed `Verifier Verdict` is binding runtime feedback.
 
 ## Verification Inputs
 

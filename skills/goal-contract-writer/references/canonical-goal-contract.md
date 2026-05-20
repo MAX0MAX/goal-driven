@@ -1,6 +1,6 @@
 # Canonical Goal Contract
 
-The Goal Contract is the stable artifact that `goal-driven` produces.
+The Goal Contract is the stable artifact that `goal-contract-writer` produces.
 
 ## Purpose
 

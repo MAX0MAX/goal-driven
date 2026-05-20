@@ -1,6 +1,6 @@
 # Goal-Driven Examples
 
-These examples show how `goal-driven` turns ambiguous requests into canonical Goal Contracts.
+These examples show how `goal-contract-writer` turns ambiguous requests into canonical Goal Contracts.
 
 Each example includes:
 

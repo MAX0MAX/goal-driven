@@ -1,0 +1,4 @@
+interface:
+  display_name: "Goal Contract Writer"
+  short_description: "Produce a canonical Goal Contract"
+  default_prompt: "Use $goal-contract-writer to turn this request into a Goal Contract with goal, scope, success_criteria, evidence, and guardrails."

@@ -1,4 +1,0 @@
-interface:
-  display_name: "Goal-Driven"
-  short_description: "Produce a canonical Goal Contract"
-  default_prompt: "Use $goal-driven to turn this request into a Goal Contract with goal, scope, success_criteria, evidence, and guardrails."

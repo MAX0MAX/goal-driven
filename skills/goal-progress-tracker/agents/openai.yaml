@@ -1,0 +1,4 @@
+interface:
+  display_name: "Goal Progress Tracker"
+  short_description: "Maintain a Goal Progress Log for runtime handoff and recovery"
+  default_prompt: "Use $goal-progress-tracker only when a runtime or operator explicitly provides an existing Goal Contract plus current_status, completed_steps, attempted_paths, verified_evidence, active_blockers, and resume guidance. It must not draft contracts or judge verifier authority. Read the full tracking package, then return only a Goal Progress Log markdown artifact or a Tracking Escalation if the package is not resumable."

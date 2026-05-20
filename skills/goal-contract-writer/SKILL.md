@@ -1,17 +1,17 @@
 ---
-name: goal-driven
+name: goal-contract-writer
 description: Use when the user asks to define a goal, create a Goal Contract, or clarify a concrete task's goal, scope, success criteria, evidence, or guardrails before planning or execution.
 ---
 
-# Goal-Driven
+# Goal Contract Writer
 
 ## Overview
 
-`goal-driven` turns ambiguous work into a standard Goal Contract.
+`goal-contract-writer` turns ambiguous work into a standard Goal Contract.
 
 Clarify only what is required to define the work. Then return the canonical contract. Conversation is not the product.
 
-`goal-driven` is the only normal user-facing entrypoint. The paired `goal-contract-verifier` skill exists for runtimes that want isolated verification later, but verifier behavior is not part of this skill's required output.
+`goal-contract-writer` is the only normal user-facing entrypoint. The paired `goal-contract-verifier` skill exists for runtimes that want isolated verification later, but verifier behavior is not part of this skill's required output.
 
 ## When to Use
 
@@ -70,7 +70,7 @@ Downstream systems consume the contract after this skill defines it.
 - A specification system may use it for persistent spec or task assets.
 - A human operator may execute directly from it.
 - Adapter-specific routing, ownership, runtime state, or verifier artifacts belong outside the canonical contract.
-- Runtimes may invoke the paired `goal-contract-verifier` later, but that runtime policy does not change what `goal-driven` returns.
+- Runtimes may invoke the paired `goal-contract-verifier` later, but that runtime policy does not change what `goal-contract-writer` returns.
 
 Use `references/downstream-adapters.md` for adapter rules and examples.
 

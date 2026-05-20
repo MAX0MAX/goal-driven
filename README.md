@@ -1,31 +1,31 @@
 # Goal-Driven
 
-Goal-Driven is a contract-first skill package for coding agents. Its public entrypoint turns an ambiguous request into a standard Goal Contract.
+Goal-Driven is a contract-first skill package for coding agents. Its public authoring entrypoint `goal-contract-writer` turns an ambiguous request into a standard Goal Contract.
 
-This repository is the single source of truth for the package. `skills/goal-driven/` holds the public authoring skill. `skills/goal-contract-verifier/` holds the paired verifier skill for isolated runtime verification; it may still be visible in host skill listings. `.claude-plugin/` and `.codex-plugin/` are thin wrappers for Claude Code and Codex.
+This repository is the single source of truth for the package. `skills/goal-contract-writer/` holds the public authoring skill. `skills/goal-contract-verifier/` holds the paired verifier skill for isolated runtime verification. `skills/goal-progress-tracker/` holds the paired runtime tracking skill for human-readable handoff and recovery logs. Paired runtime skills may still be visible in host skill listings. `.claude-plugin/` and `.codex-plugin/` are thin wrappers for Claude Code and Codex.
 
-`goal-driven` is the only normal user-facing entrypoint. Its job is to turn an ambiguous request into the canonical Goal Contract artifact. `goal-contract-verifier` is a separate paired skill that runtimes may call with isolated context when they need independent verification.
+`goal-contract-writer` is the only normal user-facing entrypoint. Its job is to turn an ambiguous request into the canonical Goal Contract artifact. `goal-contract-verifier` is the paired runtime validation skill. `goal-progress-tracker` is the paired runtime tracking skill that should be maintained once the Goal Contract enters execution so the runtime preserves durable handoff state instead of trying to reconstruct it after the fact.
 
 ## Core Idea
 
-`goal-driven` is the narrow layer between clarification and execution.
+`goal-contract-writer` is the narrow layer between clarification and execution.
 
 Its value is not asking more questions. Its value is producing a stable contract that downstream systems and humans can understand, verify, execute, or turn into more detailed work without rediscovering the original intent.
 
-The verifier layer is intentionally separate from the canonical contract. Runtime artifacts such as `Verifier Verdict`, subagent isolation, and fail-closed behavior belong to adapters and host workflows, not to the Goal Contract schema itself. In runtime use, `goal-driven` defines the objective and `goal-contract-verifier` enforces alignment against that objective.
+The verifier and tracker layers are intentionally separate from the canonical contract. Runtime artifacts such as `Verifier Verdict`, `Goal Progress Log`, subagent isolation, and fail-closed behavior belong to adapters and host workflows, not to the Goal Contract schema itself. In runtime use, `goal-contract-writer` defines the objective, `goal-contract-verifier` checks alignment against that objective, and `goal-progress-tracker` preserves the execution state needed for handoff and recovery throughout execution.
 
 The project follows four principles:
 
 - Contract over conversation: discussion only exists to fill the contract.
 - Verifiability over intuition: completion must be judged by evidence, not agent confidence.
 - Execution-neutral by default: the contract defines the goal, evidence, and boundaries while downstream systems decide how to act on it.
-- Upstream first: `goal-driven` defines the work; downstream tools plan, implement, test, review, or persist specs.
+- Upstream first: `goal-contract-writer` defines the work; downstream tools plan, implement, test, review, or persist specs.
 
 It is not a replacement for Superpowers, OpenSpec, Spec Kit, Codex goal state, or any execution workflow. It is the goal artifact those systems can consume.
 
 ## What It Produces
 
-Every successful `goal-driven` run produces a Goal Contract with these fields:
+Every successful `goal-contract-writer` run produces a Goal Contract with these fields:
 
 - `goal`
 - `scope`
@@ -35,7 +35,7 @@ Every successful `goal-driven` run produces a Goal Contract with these fields:
 
 `success_criteria` are the only canonical basis for deciding whether the `goal` is complete. `evidence` proves those criteria; it does not add extra acceptance rules.
 
-Runtimes may later pair the Goal Contract with a companion `Verifier Verdict` artifact, but that runtime artifact stays outside the canonical contract. If a runtime consumes a `Verifier Verdict`, it must preserve the verdict as binding runtime feedback rather than downgrade it to advice. Keep the behavior details in [skills/goal-driven/SKILL.md](skills/goal-driven/SKILL.md), verifier behavior in [skills/goal-contract-verifier/SKILL.md](skills/goal-contract-verifier/SKILL.md), and host-facing runtime rules in [skills/goal-driven/INSTALL.md](skills/goal-driven/INSTALL.md).
+Runtimes may pair the Goal Contract with companion runtime artifacts such as `Verifier Verdict` and `Goal Progress Log`, but those artifacts stay outside the canonical contract. If a runtime consumes a `Verifier Verdict`, it must preserve the verdict as binding runtime feedback rather than downgrade it to advice. If a runtime executes a Goal Contract, it should maintain a `Goal Progress Log` from the start of execution and update it at checkpoints rather than treat tracker output as an optional post-hoc summary. Keep the behavior details in [skills/goal-contract-writer/SKILL.md](skills/goal-contract-writer/SKILL.md), verifier behavior in [skills/goal-contract-verifier/SKILL.md](skills/goal-contract-verifier/SKILL.md), tracker behavior in [skills/goal-progress-tracker/SKILL.md](skills/goal-progress-tracker/SKILL.md), and host-facing runtime rules in [skills/goal-contract-writer/INSTALL.md](skills/goal-contract-writer/INSTALL.md).
 
 ## Example
 
@@ -78,7 +78,7 @@ Goal Contract:
 
 ## When To Use It
 
-Use `goal-driven` when:
+Use `goal-contract-writer` when:
 
 - the request has a concrete outcome but starts ambiguous
 - the next agent, system, or person needs a stable goal artifact
@@ -97,13 +97,13 @@ npx codex-marketplace add MAX0MAX/goal-driven --plugin --project -y
 Default Codex skill install:
 
 ```bash
-npx skills add MAX0MAX/goal-driven --skill goal-driven --skill goal-contract-verifier -a codex
+npx skills add MAX0MAX/goal-driven --skill goal-contract-writer --skill goal-contract-verifier --skill goal-progress-tracker -a codex
 ```
 
 Default Claude Code install:
 
 ```bash
-npx skills add MAX0MAX/goal-driven --skill goal-driven --skill goal-contract-verifier --agent claude-code
+npx skills add MAX0MAX/goal-driven --skill goal-contract-writer --skill goal-contract-verifier --skill goal-progress-tracker --agent claude-code
 ```
 
 Use `-g` for a user-wide install.
@@ -111,26 +111,26 @@ Use `-g` for a user-wide install.
 After installation, ask the agent in plain language:
 
 ```text
-Use goal-driven to turn this request into a Goal Contract: <your request>
+Use goal-contract-writer to turn this request into a Goal Contract: <your request>
 ```
 
 In Codex, explicit invocation also works:
 
 ```text
-$goal-driven Turn this request into a Goal Contract: <your request>
+$goal-contract-writer Turn this request into a Goal Contract: <your request>
 ```
 
 In Claude Code, explicit invocation also works:
 
 ```text
-/goal-driven:goal-driven Turn this request into a Goal Contract: <your request>
+/goal-driven:goal-contract-writer Turn this request into a Goal Contract: <your request>
 ```
 
-The installed package also includes `skills/goal-contract-verifier/` as the paired verifier skill for subagent use. It may still appear in the installed skills tree. Normal users should invoke only `goal-driven` unless their runtime explicitly asks for verifier input.
+The installed package also includes `skills/goal-contract-verifier/` as the paired verifier skill for subagent use and `skills/goal-progress-tracker/` as the paired runtime tracking skill for handoff and recovery logs. They may still appear in the installed skills tree. Normal users should invoke only `goal-contract-writer` unless their runtime explicitly asks for verifier or tracker input.
 
-For complete install, prompt, and marketplace options, follow [skills/goal-driven/INSTALL.md](skills/goal-driven/INSTALL.md). To understand the agent-facing behavior, follow [skills/goal-driven/SKILL.md](skills/goal-driven/SKILL.md).
+For complete install, prompt, and marketplace options, follow [skills/goal-contract-writer/INSTALL.md](skills/goal-contract-writer/INSTALL.md). To understand the agent-facing behavior, follow [skills/goal-contract-writer/SKILL.md](skills/goal-contract-writer/SKILL.md).
 
-For complete before-and-after examples, see [skills/goal-driven/examples/](skills/goal-driven/examples/).
+For complete before-and-after examples, see [skills/goal-contract-writer/examples/](skills/goal-contract-writer/examples/).
 
 ## Marketplace Readiness
 
@@ -140,10 +140,12 @@ For complete before-and-after examples, see [skills/goal-driven/examples/](skill
 
 ## Repository Layout
 
-- `skills/goal-driven/`
+- `skills/goal-contract-writer/`
   Public authoring skill, references, examples, and install notes.
 - `skills/goal-contract-verifier/`
   Paired verifier skill for isolated runtime verification; it may still appear in host skill listings.
+- `skills/goal-progress-tracker/`
+  Paired tracker skill for runtime handoff and recovery logs; it may still appear in host skill listings.
 - `.claude-plugin/`
   Claude Code wrapper.
 - `.codex-plugin/`
@@ -155,23 +157,24 @@ For complete before-and-after examples, see [skills/goal-driven/examples/](skill
 
 ## Adapter Use
 
-`goal-driven` is upstream of execution.
+`goal-contract-writer` is upstream of execution.
 
 - Use a workflow system when follow-up work is planning, implementation, testing, or review.
 - Use a specification system when follow-up work is persistent spec or task work.
 - Use a human operator or host-native path when execution belongs outside the skill.
 
-Adapters may add optional routing, owner, priority, suggested-next-action metadata, or runtime verifier artifacts outside the canonical contract. Do not make that metadata part of the required Goal Contract.
+Adapters may add optional routing, owner, priority, suggested-next-action metadata, or runtime artifacts such as `Verifier Verdict` and `Goal Progress Log` outside the canonical contract. Do not make that metadata part of the required Goal Contract.
 
 Adapters must not add, replace, or override canonical `success_criteria`. Any host-specific checks stay outside the contract and do not redefine goal completion.
 
 ## Source Of Truth
 
 - Repository: https://github.com/MAX0MAX/goal-driven
-- Canonical public skill directory: `skills/goal-driven/`
+- Canonical public skill directory: `skills/goal-contract-writer/`
 - Paired verifier skill: `skills/goal-contract-verifier/` (intended for isolated runtime verification and may still appear in the installed skills tree)
-- Agent entrypoint: `skills/goal-driven/SKILL.md`
-- Install guide: `skills/goal-driven/INSTALL.md`
+- Paired tracker skill: `skills/goal-progress-tracker/` (intended for runtime handoff and recovery logs and may still appear in the installed skills tree)
+- Agent entrypoint: `skills/goal-contract-writer/SKILL.md`
+- Install guide: `skills/goal-contract-writer/INSTALL.md`
 - Claude Code wrapper: `.claude-plugin/`
 - Codex wrapper: `.codex-plugin/`
 - Codex marketplace entry: `.agents/plugins/marketplace.json`

@@ -1,8 +1,8 @@
 # Goal-Driven Installation
 
-Install `goal-driven` for the current harness, then use it to produce a canonical Goal Contract.
+Install `goal-driven` for the current harness, then use `goal-contract-writer` to produce a canonical Goal Contract.
 
-`goal-driven` is the only normal user-facing entrypoint. The installed package also includes the paired `goal-contract-verifier` skill for runtimes that want isolated verification later. That verifier skill may still appear in the installed skills tree even though normal invocation starts with `goal-driven`.
+`goal-contract-writer` is the only normal user-facing entrypoint. The installed package also includes the paired `goal-contract-verifier` skill for runtimes that want isolated verification later and the paired `goal-progress-tracker` skill for runtimes that should maintain a human-readable handoff and recovery log while the goal is being executed. These runtime skills may still appear in the installed skills tree even though normal invocation starts with `goal-contract-writer`.
 
 ## Recommended: Codex Marketplace
 
@@ -29,59 +29,59 @@ Use the open Agent Skills installer when you want a direct skill install instead
 Codex project install:
 
 ```bash
-npx skills add MAX0MAX/goal-driven --skill goal-driven --skill goal-contract-verifier -a codex
+npx skills add MAX0MAX/goal-driven --skill goal-contract-writer --skill goal-contract-verifier --skill goal-progress-tracker -a codex
 ```
 
 User-wide Codex install:
 
 ```bash
-npx skills add MAX0MAX/goal-driven --skill goal-driven --skill goal-contract-verifier -g -a codex
+npx skills add MAX0MAX/goal-driven --skill goal-contract-writer --skill goal-contract-verifier --skill goal-progress-tracker -g -a codex
 ```
 
 Claude Code project install:
 
 ```bash
-npx skills add MAX0MAX/goal-driven --skill goal-driven --skill goal-contract-verifier --agent claude-code
+npx skills add MAX0MAX/goal-driven --skill goal-contract-writer --skill goal-contract-verifier --skill goal-progress-tracker --agent claude-code
 ```
 
 User-wide Claude Code install:
 
 ```bash
-npx skills add MAX0MAX/goal-driven --skill goal-driven --skill goal-contract-verifier --agent claude-code -g
+npx skills add MAX0MAX/goal-driven --skill goal-contract-writer --skill goal-contract-verifier --skill goal-progress-tracker --agent claude-code -g
 ```
 
 Codex and Claude Code together:
 
 ```bash
-npx skills add MAX0MAX/goal-driven --skill goal-driven --skill goal-contract-verifier --agent codex --agent claude-code
+npx skills add MAX0MAX/goal-driven --skill goal-contract-writer --skill goal-contract-verifier --skill goal-progress-tracker --agent codex --agent claude-code
 ```
 
 Company-internal Git repo install:
 
 ```bash
-npx skills add https://github.com/<company>/goal-driven --skill goal-driven --skill goal-contract-verifier --agent codex --agent claude-code
+npx skills add https://github.com/<company>/goal-driven --skill goal-contract-writer --skill goal-contract-verifier --skill goal-progress-tracker --agent codex --agent claude-code
 ```
 
-Keep both `goal-driven` and `goal-contract-verifier` in the install command so runtimes that use isolated verification can find the paired verifier from the same source tree. Normal users should still invoke only `goal-driven`.
+Keep `goal-contract-writer`, `goal-contract-verifier`, and `goal-progress-tracker` in the install command so runtimes that use isolated verification or maintained runtime handoff logs can find the paired skills from the same source tree. Normal users should still invoke only `goal-contract-writer`.
 
 ## Simple Prompt Use
 
 Users do not need to know the schema first. They can ask in plain language:
 
 ```text
-Use goal-driven to turn this request into a Goal Contract: <your request>
+Use goal-contract-writer to turn this request into a Goal Contract: <your request>
 ```
 
 Explicit Codex invocation:
 
 ```text
-$goal-driven Turn this request into a Goal Contract: <your request>
+$goal-contract-writer Turn this request into a Goal Contract: <your request>
 ```
 
 Explicit Claude Code invocation:
 
 ```text
-/goal-driven:goal-driven Turn this request into a Goal Contract: <your request>
+/goal-driven:goal-contract-writer Turn this request into a Goal Contract: <your request>
 ```
 
 ## Publish To Codex Marketplace
@@ -159,12 +159,12 @@ claude --plugin-dir /Users/you/path/to/goal-driven
 Invoke:
 
 ```text
-/goal-driven:goal-driven Turn this request into a Goal Contract: <your request>
+/goal-driven:goal-contract-writer Turn this request into a Goal Contract: <your request>
 ```
 
 ## Output Standard
 
-A successful `goal-driven` run returns one canonical artifact:
+A successful `goal-contract-writer` run returns one canonical artifact:
 
 ```yaml
 Goal Contract:
@@ -240,6 +240,8 @@ Runtime status values are:
 - `complete`
 - `blocked`
 
+Use the same three runtime states for `goal-progress-tracker`. If execution stops without completion, keep tracker status `blocked` and record the failed handoff context in the log instead of inventing a fourth runtime state.
+
 A runtime may preserve the resulting companion artifact outside the contract body:
 
 ```yaml
@@ -285,12 +287,87 @@ Examples of optional wrapper metadata:
 - priority
 - suggested next action
 - runtime verifier artifacts
+- runtime progress artifacts
 
 Adapters must not add, replace, or override canonical `success_criteria`.
 
+## Runtime Tracking During Execution
+
+Once a Goal Contract enters execution, the runtime should maintain `goal-progress-tracker` with current execution state.
+
+Recommended package:
+
+```yaml
+Tracking Package:
+  goal_contract:
+    Goal Contract:
+      goal: "<one-sentence end state>"
+      scope:
+        in_scope:
+          - "<required work>"
+        out_of_scope:
+          - "<excluded work>"
+      success_criteria:
+        - "<observable completion condition>"
+      evidence:
+        - criterion: "<criterion or group>"
+          proof:
+            - "<planned command, artifact, diff, or review gate>"
+      guardrails:
+        - "<constraint, escalation rule, or approval boundary>"
+  current_status: "on_track"
+  completed_steps: []
+  in_flight_step: "<current focus>"
+  attempted_paths: []
+  verified_evidence: []
+  active_blockers:
+    - "<blocking issue or none>"
+  resume_hint:
+    - "<where to continue from>"
+```
+
+The resulting companion artifact also stays outside the contract body:
+
+```markdown
+# Goal Progress Log
+
+## Goal Summary
+- Goal: ...
+- Status: on_track
+- Last checkpoint: 2026-05-20T15:00:00Z
+
+## Current Execution State
+- Completed since last checkpoint: ...
+- Current focus: ...
+
+## Attempted Paths
+- Path: ...
+  Result: worked
+  Evidence: ...
+
+## Verified Evidence
+- Criterion: ...
+  Proof: ...
+
+## Active Blockers
+- none
+
+## Resume From Here
+- Next action: ...
+- Avoid repeating: ...
+
+## Checkpoint History
+### 2026-05-20T15:00:00Z - on_track
+- Summary: ...
+```
+
+Start `Goal Progress Log` when execution starts, then update it at meaningful checkpoints instead of reconstructing it only after completion or failure. Use it to show current execution state, attempted paths, verified evidence, blockers, and where a later agent or human should resume. Do not treat it as a replacement for the Goal Contract or the Verifier Verdict.
+
+For the initial checkpoint, empty `completed_steps`, `attempted_paths`, and `verified_evidence` are valid. The runtime should render those sections explicitly as `none yet` instead of escalating.
+
 ## Failure Conditions
 
-A `goal-driven` run is incomplete if:
+A `goal-contract-writer` run is incomplete if:
 
 - the output is not a Goal Contract
 - `success_criteria` are not binary, observable, and complete enough to define goal completion
