@@ -1,6 +1,6 @@
 ---
 name: goal-contract-verifier
-description: Use only when a runtime dispatches a fresh verifier subagent with an existing Goal Contract plus current progress, evidence, and blockers and must independently judge runtime state; not for normal user-facing contract drafting.
+description: Use only as a fresh verifier subagent when a runtime or operator provides an existing Goal Contract plus current progress, evidence, and blockers and must independently judge execution state; not for normal user-facing contract drafting.
 ---
 
 # Goal Contract Verifier
@@ -9,9 +9,9 @@ description: Use only when a runtime dispatches a fresh verifier subagent with a
 
 `goal-contract-verifier` is the paired verification skill for Goal Contracts.
 
-Use it when a runtime reaches a required verifier gate and dispatches a fresh verifier subagent to check current state against a previously authored Goal Contract. This skill does not rewrite the contract, does not continue into planning or execution, and does not return free-form review prose. It returns only a structured `Verifier Verdict`.
+Use it when a runtime or operator dispatches a fresh verifier subagent to check current execution state against a previously authored Goal Contract. This skill does not rewrite the contract, does not continue into planning or execution, and does not return free-form review prose. It returns only a structured `Verifier Verdict`.
 
-The `Verifier Verdict` is mandatory runtime gate feedback, not advice. Once a runtime dispatches this verifier, it must respect the verdict and status when interpreting whether current work still aligns with the Goal Contract.
+The `Verifier Verdict` is execution-state verification output, not advice. Once a runtime or operator dispatches this verifier, it must respect the verdict and status when interpreting whether current work still aligns with the Goal Contract.
 
 ## When To Use
 
@@ -62,19 +62,12 @@ Use `references/contract-validation.md` for the full runtime validation protocol
 
 ## Runtime Constraint
 
-This verifier is the mandatory check at required runtime gates, but it still does not take over planning, execution, recovery, or completion. The runtime must dispatch it in a fresh subagent before execution starts or continues at those gates.
+This verifier checks execution state when a runtime or operator invokes it. It does not decide when execution should start, and it does not take over planning, execution, recovery, or completion. Every invocation must run in a fresh subagent rather than the main execution context.
 
 - `pass` means the Goal Contract still frames the current state; it does not mean the goal is complete unless `status` is also `complete`.
 - `revise contract` means the current Goal Contract is not reliable enough to constrain the goal; the runtime must return to the authoring layer before treating the current state as aligned.
 - `escalate` means the runtime lacks enough trustworthy input, evidence, approval, or consistency to judge alignment; the runtime must stop optimistic interpretation and escalate outside the verifier.
 - `blocked` means execution is blocked; the runtime must not summarize the goal as complete.
-
-Required verifier gates are:
-
-- execution start before the first work step
-- execution path changes
-- blocker appearance or blocker-state change
-- any claim of completion
 
 ## Validation Standard
 
@@ -99,7 +92,7 @@ Return exactly one structured `Verifier Verdict` block and nothing else.
 - Keep `reasons` concrete and tied to the contract or runtime package.
 - Use only these verdict values: `pass`, `revise contract`, `escalate`.
 - Use only these status values: `on_track`, `complete`, `blocked`.
-- Any runtime that receives anything other than this exact structured artifact must fail closed.
+- Any runtime or operator that receives anything other than this exact structured artifact must fail closed for that verification request.
 
 Use this format:
 
@@ -150,6 +143,8 @@ A runtime may therefore legitimately return combinations such as:
 - `revise contract` + `blocked`
 - `escalate` + `blocked`
 
+`pass` + `blocked` is a valid verifier result. It means the Goal Contract still frames the runtime state correctly, but execution remains blocked; consumers must preserve the blocked status and must not summarize the goal as complete or progress as unblocked.
+
 ## Failure Discipline
 
 Return `pass` when the current runtime state does not expose a contract gap or escalation trigger.
@@ -165,7 +160,7 @@ Return `escalate` when:
 
 Never collapse `on_track` into `complete`, and never use `pass` as a shortcut for "done".
 
-If runtime dispatch fails before this skill can return, that failure is a fail-closed runtime event and execution must stop outside this skill.
+If runtime dispatch fails before this skill can return, that failure is a fail-closed verification event outside this skill.
 
 ## Runtime Boundary
 
@@ -173,4 +168,4 @@ This skill returns runtime validation only.
 
 - `Goal Contract` remains the canonical artifact.
 - `Verifier Verdict` remains a companion runtime artifact outside the canonical contract.
-- Fresh-subagent dispatch and fail-closed handling are mandatory runtime protocol rules, not Goal Contract schema fields.
+- Fresh-subagent dispatch and fail-closed handling are verifier invocation rules, not Goal Contract schema fields.

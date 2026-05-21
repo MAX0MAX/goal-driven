@@ -1,6 +1,6 @@
 {
   "name": "goal-driven",
-  "description": "Contract-first skill package for Claude Code. Public goal-contract-writer produces canonical Goal Contracts with paired verifier and progress tracker runtime skills.",
+  "description": "Contract-first skill package for Claude Code. Public goal-contract-writer produces canonical Goal Contracts with paired fresh-subagent verifier and progress tracker runtime skills.",
   "version": "1.4.0",
   "author": {
     "name": "Yifei Huang"

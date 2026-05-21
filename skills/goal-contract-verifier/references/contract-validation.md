@@ -2,7 +2,7 @@
 
 Runtime verification checks whether current progress, evidence, and blockers still justify a Goal Contract as written.
 
-This is a paired runtime protocol for `goal-contract-verifier`, not part of canonical Goal Contract generation. `goal-contract-writer` authors the contract. If a runtime executes a Goal Contract, it must dispatch `goal-contract-verifier` in a fresh subagent at the required runtime gates, and the resulting `Verifier Verdict` is binding runtime feedback.
+This is a paired runtime protocol for `goal-contract-verifier`, not part of canonical Goal Contract generation. `goal-contract-writer` authors the contract. When a runtime or operator invokes `goal-contract-verifier` to verify execution state, it must dispatch the verifier in a fresh subagent, and the resulting `Verifier Verdict` is binding verification output.
 
 ## Verification Inputs
 
@@ -34,16 +34,9 @@ Then read the contract fields in full:
 
 ## Runtime Constraint
 
-The verifier does not take over planning, execution, recovery, or completion, but its invocation timing is fixed by the runtime protocol.
+The verifier does not take over planning, execution, recovery, or completion. It verifies the current execution state supplied by the runtime or operator, and every invocation must run in a fresh subagent.
 
-Required verifier gates are:
-
-- execution start before the first work step
-- execution path changes
-- blocker appearance or blocker-state change
-- any claim of completion
-
-At each gate, the runtime must update `Goal Progress Log` first, then dispatch `goal-contract-verifier` in a fresh subagent.
+The verifier is not an automatic pre-execution gate. Invoke it when there is current progress, evidence, or blocker state to verify against the Goal Contract.
 
 Once a runtime dispatches `goal-contract-verifier`, the resulting `Verifier Verdict` constrains runtime interpretation:
 
@@ -54,7 +47,7 @@ Once a runtime dispatches `goal-contract-verifier`, the resulting `Verifier Verd
 - If `status` is `blocked`, do not summarize the goal as complete.
 - Use `status` to distinguish `on_track`, `complete`, and `blocked` runtime states.
 
-If fresh-subagent dispatch fails, or the response is not a standard `Verifier Verdict`, the runtime must fail closed, stop optimistic execution, and record the blocked handoff state outside the verifier.
+If fresh-subagent dispatch fails, or the response is not a standard `Verifier Verdict`, the runtime or operator must fail closed for that verification request and must not claim verification passed or that the goal is complete.
 
 ## Runtime Status
 

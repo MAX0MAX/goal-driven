@@ -11,7 +11,7 @@ description: Use when a runtime or operator already has a Goal Contract and must
 
 Use it to maintain one recovery-oriented Markdown artifact: `Goal Progress Log`.
 
-This skill does not define the goal, does not rewrite the Goal Contract, does not replace runtime verification, and does not continue into planning or execution. It records the current state of execution clearly enough that a human or later agent can inspect the work, understand what has already been tried, and continue from the right checkpoint. Once a Goal Contract enters execution, this tracker must be maintained from the initial checkpoint onward rather than reconstructed only after the work stops.
+This skill does not define the goal, does not rewrite the Goal Contract, does not replace runtime verification, and does not continue into planning or execution. It records the current state of execution clearly enough that a human or later agent can inspect the work, understand what has already been tried, and continue from the right checkpoint. When a runtime or operator maintains handoff state for a Goal Contract, this tracker is the protocol for keeping that state current from the initial checkpoint onward rather than reconstructing it only after the work stops.
 
 ## When To Use
 
@@ -24,7 +24,7 @@ Use this skill only when all of these are true:
 
 Do not use this skill to draft a Goal Contract from scratch, judge contract validity, prescribe execution strategy, or replace a plan or checklist system.
 
-Post-hoc reconstruction after execution has already finished is a protocol failure fallback when no maintained log exists. It is not compliant primary workflow.
+Post-hoc reconstruction after execution has already finished is a recovery fallback when no maintained log exists. It is not compliant primary workflow for a runtime or operator that elected to maintain tracker handoff state.
 
 ## Required Input
 
@@ -71,7 +71,7 @@ Tracking Package:
 
 If the package does not contain enough information to let another agent or person resume safely, return `Tracking Escalation` instead of inventing a reassuring summary.
 
-At each required verifier gate, the runtime must update this log before dispatching the fresh verifier subagent. If verifier dispatch fails or returns a blocking result, the runtime must update the log again to reflect the blocked handoff state.
+If verifier output is available, record the verifier verdict as part of the current execution state. If verifier dispatch fails or returns a blocking result, record that blocked handoff state before any external escalation or contract-revision flow.
 
 Use `references/progress-log-format.md` for the log schema and checkpoint update rules.
 
@@ -85,7 +85,7 @@ The tracker does not define a separate fourth terminal status. If execution stop
 
 ## Initial Checkpoint
 
-The tracker must support the mandatory moment execution has just started.
+The tracker must support the moment execution has just started.
 
 For an initial checkpoint, these inputs are valid:
 
@@ -118,14 +118,14 @@ Return exactly one of these outcomes:
 
 ## Checkpoint Update Discipline
 
-Once execution starts, update the log at required gates and any other meaningful checkpoints such as:
+Once execution starts, update the log at meaningful checkpoints such as:
 
-- execution start before the first verifier run
+- execution start
 - a key sub-goal is completed
 - the execution path changes
 - a new blocker appears
 - blocker state changes
-- verifier status changes
+- verifier status changes when verification is invoked
 - the session is stopping and needs a handoff summary
 - any claim of completion
 
@@ -222,7 +222,7 @@ Make the handoff concrete:
 
 If that standard cannot be met, escalate.
 
-If verifier dispatch fails, or verifier returns `revise contract`, `escalate`, or `status: blocked`, the runtime must record that blocked handoff state in the log before continuing with any external escalation or contract revision flow.
+If verifier dispatch fails after verification is invoked, or verifier returns `revise contract`, `escalate`, or `status: blocked`, the runtime must record that blocked handoff state in the log before continuing with any external escalation or contract revision flow.
 
 ## Runtime Boundary
 
@@ -230,6 +230,6 @@ If verifier dispatch fails, or verifier returns `revise contract`, `escalate`, o
 
 `Verifier Verdict` remains the runtime validation artifact.
 
-`Goal Progress Log` remains the mandatory runtime handoff and recovery artifact that must be maintained throughout execution.
+`Goal Progress Log` remains the runtime handoff and recovery artifact maintained throughout execution.
 
 These three artifacts complement each other. None of them replaces the others.

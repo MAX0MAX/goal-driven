@@ -11,7 +11,9 @@ description: Use when the user asks to define a goal, create a Goal Contract, or
 
 Clarify only what is required to define the work. Then return the canonical contract. Conversation is not the product.
 
-`goal-contract-writer` is the only normal user-facing entrypoint. The paired `goal-contract-verifier` skill exists for runtimes that must perform mandatory fresh-subagent verification at execution gates, but verifier behavior is not part of this skill's required output.
+This skill does not implement, run, or manage a Goal-Driven agent loop. It defines the upstream contract that a loop, workflow engine, host goal system, or human operator can execute and verify.
+
+`goal-contract-writer` is the only normal user-facing entrypoint. The paired `goal-contract-verifier` skill exists for runtimes or operators that need fresh-subagent verification of execution state, but verifier behavior is not part of this skill's required output.
 
 ## When to Use
 
@@ -70,7 +72,7 @@ Downstream systems consume the contract after this skill defines it.
 - A specification system may use it for persistent spec or task assets.
 - A human operator may execute directly from it.
 - Adapter-specific routing, ownership, runtime state, or verifier artifacts belong outside the canonical contract.
-- Runtimes that execute the contract must invoke the paired `goal-contract-verifier` at required execution gates, but that runtime protocol does not change what `goal-contract-writer` returns.
+- Runtimes or operators may invoke the paired `goal-contract-verifier` to verify execution state, but that verification flow does not change what `goal-contract-writer` returns.
 
 Use `references/downstream-adapters.md` for adapter rules and examples.
 

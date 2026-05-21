@@ -1,13 +1,13 @@
 {
   "name": "goal-driven-dev",
-  "description": "Development marketplace for the Goal-Driven contract-first package with paired verifier and progress tracker runtime skills",
+  "description": "Development marketplace for the Goal-Driven contract-first package with paired fresh-subagent verifier and progress tracker runtime skills",
   "owner": {
     "name": "Yifei Huang"
   },
   "plugins": [
     {
       "name": "goal-driven",
-      "description": "Public goal-contract-writer entrypoint for canonical Goal Contracts with paired verifier and progress tracker runtime skills.",
+      "description": "Public goal-contract-writer entrypoint for canonical Goal Contracts with paired fresh-subagent verifier and progress tracker runtime skills.",
       "version": "1.4.0",
       "source": "./",
       "author": {

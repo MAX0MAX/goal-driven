@@ -1,7 +1,7 @@
 {
   "name": "goal-driven",
   "version": "1.4.0",
-  "description": "Contract-first skill package that turns ambiguous requests into canonical Goal Contracts and includes paired runtime verification and progress-tracking skills.",
+  "description": "Contract-first skill package that turns ambiguous requests into canonical Goal Contracts and includes paired fresh-subagent execution-state verification and progress-tracking skills.",
   "category": "Developer Tools",
   "platforms": [
     "codex",
