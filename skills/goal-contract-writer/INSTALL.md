@@ -2,7 +2,7 @@
 
 Install `goal-driven` for the current harness, then use `goal-contract-writer` to produce a canonical Goal Contract.
 
-`goal-contract-writer` is the only normal user-facing entrypoint. The installed package also includes the paired `goal-contract-verifier` skill for runtimes that want isolated verification later and the paired `goal-progress-tracker` skill for runtimes that should maintain a human-readable handoff and recovery log while the goal is being executed. These runtime skills may still appear in the installed skills tree even though normal invocation starts with `goal-contract-writer`.
+`goal-contract-writer` is the only normal user-facing entrypoint. The installed package also includes the paired `goal-contract-verifier` skill for mandatory fresh-subagent runtime gate checks and the paired `goal-progress-tracker` skill for mandatory execution-state logging while the goal is being executed. These runtime skills may still appear in the installed skills tree even though normal invocation starts with `goal-contract-writer`.
 
 ## Recommended: Codex Marketplace
 
@@ -62,7 +62,7 @@ Company-internal Git repo install:
 npx skills add https://github.com/<company>/goal-driven --skill goal-contract-writer --skill goal-contract-verifier --skill goal-progress-tracker --agent codex --agent claude-code
 ```
 
-Keep `goal-contract-writer`, `goal-contract-verifier`, and `goal-progress-tracker` in the install command so runtimes that use isolated verification or maintained runtime handoff logs can find the paired skills from the same source tree. Normal users should still invoke only `goal-contract-writer`.
+Keep `goal-contract-writer`, `goal-contract-verifier`, and `goal-progress-tracker` in the install command so any runtime that executes a Goal Contract can enforce the mandatory tracker and verifier protocol from the same source tree. Normal users should still invoke only `goal-contract-writer`.
 
 ## Simple Prompt Use
 
@@ -194,11 +194,25 @@ Required fields:
 
 Do not stop at advice, brainstorming, or implementation. Do not add runtime verdicts or host routing fields to the canonical contract.
 
-## Optional Runtime Verification
+## Mandatory Runtime Protocol
 
-Runtimes that want an isolated check may call `goal-contract-verifier` later with current state.
+If a runtime executes a Goal Contract, this protocol is mandatory:
 
-Recommended package:
+1. Produce or update `Goal Progress Log` before the first work step.
+2. Dispatch `goal-contract-verifier` in a fresh subagent.
+3. Read exactly one structured `Verifier Verdict`.
+4. Start or continue execution only when that verifier result allows it.
+
+The same sequence repeats at every required runtime gate:
+
+- execution start before the first work step
+- execution path changes
+- blocker appearance or blocker-state change
+- any claim of completion
+
+At each required gate, tracker update happens first and verifier dispatch happens second.
+
+Use this verification package:
 
 ```yaml
 Verification Package:
@@ -242,7 +256,7 @@ Runtime status values are:
 
 Use the same three runtime states for `goal-progress-tracker`. If execution stops without completion, keep tracker status `blocked` and record the failed handoff context in the log instead of inventing a fourth runtime state.
 
-A runtime may preserve the resulting companion artifact outside the contract body:
+A runtime that executes the contract must preserve the resulting companion artifact outside the contract body:
 
 ```yaml
 Verifier Verdict:
@@ -274,7 +288,7 @@ Interpret that artifact with two separate dimensions:
 
 A runtime may therefore report `pass` while the goal is still `on_track` or `blocked`.
 
-Fresh-subagent isolation and fail-closed behavior are runtime policy choices. Use them when the host needs stronger independence or conservative handling, but do not treat them as part of the Goal Contract schema.
+The verifier must run in a fresh subagent. The main execution context must not self-verify in place. If verifier dispatch fails, returns anything other than a structured `Verifier Verdict`, returns `revise contract`, returns `escalate`, or returns `status: blocked`, the runtime must fail closed and stop optimistic execution.
 
 ## Adapter Metadata
 
@@ -293,7 +307,7 @@ Adapters must not add, replace, or override canonical `success_criteria`.
 
 ## Runtime Tracking During Execution
 
-Once a Goal Contract enters execution, the runtime should maintain `goal-progress-tracker` with current execution state.
+Once a Goal Contract enters execution, the runtime must maintain `goal-progress-tracker` with current execution state.
 
 Recommended package:
 
@@ -361,7 +375,18 @@ The resulting companion artifact also stays outside the contract body:
 - Summary: ...
 ```
 
-Start `Goal Progress Log` when execution starts, then update it at meaningful checkpoints instead of reconstructing it only after completion or failure. Use it to show current execution state, attempted paths, verified evidence, blockers, and where a later agent or human should resume. Do not treat it as a replacement for the Goal Contract or the Verifier Verdict.
+Start `Goal Progress Log` when execution starts, then update it before every required verifier gate and at any other meaningful checkpoint instead of reconstructing it only after completion or failure. Use it to show current execution state, attempted paths, verified evidence, blockers, and where a later agent or human should resume. Do not treat it as a replacement for the Goal Contract or the Verifier Verdict.
+
+Required tracker updates include:
+
+- execution start before the first verifier run
+- execution path changes
+- blocker appearance or blocker-state change
+- verifier status changes
+- session exit or handoff
+- any claim of completion
+
+If a verifier result blocks continuation, or verifier dispatch fails, update the tracker again to reflect the blocked state and resume guidance before handing off.
 
 For the initial checkpoint, empty `completed_steps`, `attempted_paths`, and `verified_evidence` are valid. The runtime should render those sections explicitly as `none yet` instead of escalating.
 
@@ -375,7 +400,7 @@ A `goal-contract-writer` run is incomplete if:
 - `scope` does not define meaningful boundaries
 - `guardrails` omit known constraints or escalation triggers
 
-Runtime verifier dispatch failures are runtime concerns. If a host adopts fail-closed verification, enforce that policy in the runtime or adapter layer rather than by changing the Goal Contract schema.
+Runtime verifier dispatch failures are fail-closed runtime events. If the host cannot obtain a fresh verifier result at a required gate, it must stop optimistic execution, record the blocked state in the tracker, and escalate outside the verifier.
 
 ## Updating
 

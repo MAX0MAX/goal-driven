@@ -4,6 +4,8 @@
 
 It exists outside the canonical Goal Contract. Its job is to show where execution stands now and how to continue safely later.
 
+If a runtime executes a Goal Contract, maintaining this log is mandatory from execution start onward.
+
 ## Required Sections
 
 Every `Goal Progress Log` must contain these sections in this order:
@@ -119,13 +121,15 @@ The history is append-only, but the earlier sections must always reflect the lat
 
 ## Update Protocol
 
-Update the log only at meaningful checkpoints:
+Update the log at every required verifier gate and any other meaningful checkpoint:
 
+- execution start before the first verifier run
 - key sub-goal completed
 - execution path changed
-- new blocker introduced
+- new blocker introduced or blocker state changed
 - verifier status changed
 - session exit or handoff
+- any claim of completion
 
 Do not append a new entry for every minor action. The log is a recovery artifact, not a raw transcript.
 
@@ -138,6 +142,8 @@ At each update:
 5. Refresh `Active Blockers`.
 6. Rewrite `Resume From Here` so the next executor can continue immediately.
 7. Append one condensed item to `Checkpoint History`.
+
+At required verifier gates, the tracker update happens before fresh verifier dispatch. If verifier dispatch fails, or verifier returns `revise contract`, `escalate`, or `status: blocked`, append another checkpoint that records the blocked state and the next escalation or contract-revision action.
 
 ## Failure Standard
 

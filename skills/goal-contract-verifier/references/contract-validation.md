@@ -2,7 +2,7 @@
 
 Runtime verification checks whether current progress, evidence, and blockers still justify a Goal Contract as written.
 
-This is a paired runtime protocol for `goal-contract-verifier`, not part of canonical Goal Contract generation. `goal-contract-writer` authors the contract. Runtimes may later call `goal-contract-verifier` when they want an isolated verification pass, and any consumed `Verifier Verdict` is binding runtime feedback.
+This is a paired runtime protocol for `goal-contract-verifier`, not part of canonical Goal Contract generation. `goal-contract-writer` authors the contract. If a runtime executes a Goal Contract, it must dispatch `goal-contract-verifier` in a fresh subagent at the required runtime gates, and the resulting `Verifier Verdict` is binding runtime feedback.
 
 ## Verification Inputs
 
@@ -34,9 +34,18 @@ Then read the contract fields in full:
 
 ## Runtime Constraint
 
-The verifier does not prescribe invocation timing. Fresh-subagent isolation, fail-closed behavior, and recovery mechanics are host or adapter choices, not Goal Contract schema rules.
+The verifier does not take over planning, execution, recovery, or completion, but its invocation timing is fixed by the runtime protocol.
 
-Once a runtime invokes or consumes `goal-contract-verifier`, the resulting `Verifier Verdict` constrains runtime interpretation:
+Required verifier gates are:
+
+- execution start before the first work step
+- execution path changes
+- blocker appearance or blocker-state change
+- any claim of completion
+
+At each gate, the runtime must update `Goal Progress Log` first, then dispatch `goal-contract-verifier` in a fresh subagent.
+
+Once a runtime dispatches `goal-contract-verifier`, the resulting `Verifier Verdict` constrains runtime interpretation:
 
 - Consume exactly one `verdict` and one `status`.
 - If `verdict` is `pass`, the Goal Contract still frames the current runtime state, but completion still depends on `status`.
@@ -44,6 +53,8 @@ Once a runtime invokes or consumes `goal-contract-verifier`, the resulting `Veri
 - If `verdict` is `escalate`, stop optimistic interpretation and resolve the missing input, blocker, contradiction, or approval boundary outside the verifier.
 - If `status` is `blocked`, do not summarize the goal as complete.
 - Use `status` to distinguish `on_track`, `complete`, and `blocked` runtime states.
+
+If fresh-subagent dispatch fails, or the response is not a standard `Verifier Verdict`, the runtime must fail closed, stop optimistic execution, and record the blocked handoff state outside the verifier.
 
 ## Runtime Status
 
@@ -68,7 +79,7 @@ If verification fails, use one of these outcomes:
 - `revise contract`: the contract no longer frames the runtime state precisely enough, so the runtime must return to the authoring layer
 - `escalate`: the runtime state depends on missing decisions, missing evidence, unresolved blockers, or contradictions, so the runtime must escalate outside the verifier
 
-Advice text, workflow prose, or any non-standard verifier response should be treated as an escalation in runtimes that require strict structured outputs.
+Advice text, workflow prose, or any non-standard verifier response must be treated as a fail-closed verifier failure.
 
 Common failure signals include partial goal coverage, unsupported evidence, evidence that hides missing criteria, subjective success criteria, process-only criteria, weak guardrails, or blockers that should have changed scope but never made it back into the contract.
 

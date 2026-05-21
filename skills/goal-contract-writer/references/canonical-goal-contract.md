@@ -106,7 +106,7 @@ evidence_gaps:
     reason: "<why current evidence cannot prove or disprove the criterion>"
 ```
 
-That runtime artifact is optional from the contract's perspective. It is not a Goal Contract field, and it must not become a required part of the canonical schema.
+That runtime artifact is optional from the contract schema's perspective. It is not a Goal Contract field, and it must not become a required part of the canonical schema. A runtime that executes a Goal Contract may still require it by protocol.
 
 ## Adapter Metadata
 
